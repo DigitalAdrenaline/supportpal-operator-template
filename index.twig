@@ -5,7 +5,7 @@
     {{ View.fireHook('operator.head_start') }}
 
     {% set title = block('title') is defined ? block('title') : '' %}
-    <title>{% if title is not empty %}{{ title|raw }} - {% endif %}{{ Lang.get('core.product_name') }} {{ Lang.get('core.operator_panel') }}</title>
+    <title>{% if title is not empty %}{{ title|raw }} - {% endif %} Operator Panel</title>
 
     {% block meta %}{% endblock %}
 
