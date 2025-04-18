@@ -2,7 +2,7 @@
 <html class="{{ get_template_mode() }} sp-h-full" dir="{{ get_template_dir() }}" lang="{{ App.getLocale() }}">
 
 <head>
-    <title>{% block title %}{{ Lang.get('core.product_name') }} - {{ Lang.get('core.operator_panel') }}{% endblock %}</title>
+    <title>{% block title %}{{ Lang.get('core.operator_panel') }}{% endblock %}</title>
 
     {% include 'operator.' ~ template ~ '.head_common' %}
 
@@ -20,7 +20,7 @@
             <div class="sp-p-6 sp-bg-primary-800 sp-text-center xs:sp-rounded-t">
                 {% block logo %}
                     <img src="{{ get_icon('resources/assets/operator/images/favicon/favicon_white.png') }}"
-                         alt="{{ Lang.get('core.product_name') }}" class="sp-inline sp-max-w-xl" />
+                         alt="Tickets" class="sp-inline sp-max-w-xl" />
                 {% endblock %}
 
                 <h1 class="sp-mt-6 sp-mb-0 sp-text-white sp-text-3xl sp-leading-none">
