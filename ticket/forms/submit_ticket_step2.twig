@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block precontent %}
-    <div class="sp-alert sp-alert-error sp-alert-sticky sp-hidden attachment"></div>
+    <div class="sp-alert sp-alert-error sp-alert-sticky sp:hidden attachment"></div>
 {% endblock %}
 
 {% block content %}
@@ -68,13 +68,7 @@
             <div class="sp-form-row sp-form-full">
                 {{ form_label('select', Lang.choice('ticket.tag', 2)) }}
                 <div class="sp-input-container">
-                    <select name="tag[]" multiple="multiple">
-                        {% for tag in tags %}
-                            <option value='{{ tag.name }}' data-data='{{ tag|json_encode(constant('JSON_FORCE_OBJECT')) }}'>
-                                {{ tag.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                    <select name="tag[]" multiple="multiple"></select>
                 </div>
             </div>
 
@@ -82,9 +76,8 @@
                 {{ form_label('assignedto[]', Lang.get('ticket.assigned_to')) }}
                 <div class="sp-input-container">
                     <select name="assignedto[]" multiple="multiple">
-                        {% for operator in departmentOperators %}
-                            <option {% if operator.id in department.default_assignedto %}selected="selected"{% endif %}
-                                data-data='{{ operator|json_encode(constant('JSON_FORCE_OBJECT')) }}' value='{{ operator.id }}'>
+                        {% for operator in defaultAssigned %}
+                            <option selected="selected" data-data='{{ operator|json_encode(constant('JSON_FORCE_OBJECT')) }}' value='{{ operator.id }}'>
                                 {{ operator.formatted_name }}
                             </option>
                         {% endfor %}
@@ -107,51 +100,23 @@
 
             <div class="sp-form-row sp-form-full">
                 {{ form_label('text', Lang.choice('general.message', 1)) }}
-                <div class="sp-input-container">
+                <div class="sp-input-container sp:relative">
                     <div class="recipients">
-                        <div class="sp-simplified-recipients sp-px-3 sp-py-1 sp-cursor-pointer">
-                            <div class="sp-truncate">
-                                <span class="sp-pe-2 sp-text-secondary">{{ Lang.get('ticket.from') }}</span>
-                                {{ fromEmails|first }}
-                            </div>
-                            <div class="sp-truncate">
-                                <span class="sp-pe-2 sp-text-secondary">{{ Lang.get('ticket.to') }}</span>
-                                <ul class="sp-recipients-list">
-                                    <!--
-                                    {% for user in toEmails %}
-                                        {# We hide operators that aren't currently emailed, but if they're added to the assigned list then we'll show them #}
-                                        --><li class="{% if internal %}operator operator-{{ user.id }}{% endif %} {% if internal and (defaultAssigned is not empty and user.id not in defaultAssigned) %}sp-hidden{% endif %}">
-                                            {{ user.formatted_name }}
-                                            {% if user.email is not empty %}&lt;{{ user.email }}&gt;{% endif %}<!--
-                                        --></li><!--
-                                    {% endfor %}
-                                    -->
-                                </ul>
-                            </div>
-                            {% if organisationEmails is not empty %}
-                                <div class="sp-truncate">
-                                    <span class="sp-pe-2 sp-text-secondary">{{ Lang.get('ticket.cc') }}</span>
-                                    {{ organisationEmails.join(', ') }}
-                                </div>
-                            {% elseif not internal %}
-                                <a class="add-cc sp-text-secondary">{{ Lang.get('ticket.add_cc') }}</a>
-                            {% endif %}
-                        </div>
-                        <div class="sp-full-recipients sp-table sp-w-full sp-hidden">
-                            <div class="sp-table-row">
-                                <div class="sp-table-cell">{{ Lang.get('ticket.from') }}</div>
-                                <div class="sp-table-cell" id="fromAddress">
+                        <div class="sp:table sp:w-full">
+                            <div class="sp:table-row">
+                                <div class="sp:table-cell">{{ Lang.get('ticket.from') }}</div>
+                                <div class="sp:table-cell" id="fromAddress">
                                     {{ form_select('department_email', fromEmails) }}
                                 </div>
                             </div>
-                            <div class="sp-table-row">
-                                <div class="sp-table-cell">{{ Lang.get('ticket.to') }}</div>
-                                <div class="sp-table-cell">
+                            <div class="sp:table-row">
+                                <div class="sp:table-cell">{{ Lang.get('ticket.to') }}</div>
+                                <div class="sp:table-cell">
                                     <ul class="sp-recipients-list">
                                         <!--
                                         {% for user in toEmails %}
                                             {# We hide operators that aren't currently emailed, but if they're added to the assigned list then we'll show them #}
-                                            --><li class="{% if internal %}operator operator-{{ user.id }}{% endif %} {% if internal and (defaultAssigned is not empty and user.id not in defaultAssigned) %}sp-hidden{% endif %}">
+                                            --><li class="{% if internal %}operator operator-{{ user.id }}{% endif %} {% if internal and not defaultAssigned.has(user.id) %}sp:hidden{% endif %}">
                                                 {{ user.formatted_name }}
                                                 {% if user.email is not empty %}&lt;{{ user.email }}&gt;{% endif %}<!--
                                             --></li><!--
@@ -161,9 +126,9 @@
                                 </div>
                             </div>
                             {% if not internal %}
-                                <div class="sp-table-row cc-emails">
-                                    <div class="sp-table-cell">{{ Lang.get('ticket.cc') }}</div>
-                                    <div class="sp-table-cell" id="fromAddress">
+                                <div class="sp:table-row cc-emails">
+                                    <div class="sp:table-cell">{{ Lang.get('ticket.cc') }}</div>
+                                    <div class="sp:table-cell" id="fromAddress">
                                         <select name="cc[]" multiple="multiple">
                                             {% for email in organisationEmails %}
                                                 <option selected="selected" data-data='{{ {'value': email, 'unremovable': true}|json_encode(constant('JSON_FORCE_OBJECT')) }}'
@@ -180,15 +145,15 @@
 
                     <div class="tox-rounded-t-none">
                         {{ form_editor('text', text is not empty ? text : replyTemplate is not empty ? replyTemplate : null) }}
-                    </div>
 
-                    {% include 'operator.' ~ template ~ '.core.forms.attachments' with {
-                        'route': 'ticket.operator.attachment',
-                        'downloadRoute': 'ticket.operator.attachment.download',
-                        'attachments': [],
-                        'deleteFromServer': link_message|default is not empty ? false : true
-                    }
-                    %}
+                        {% include 'operator.' ~ template ~ '.core.forms.attachments' with {
+                            'route': 'ticket.operator.attachment',
+                            'downloadRoute': 'ticket.operator.attachment.download',
+                            'attachments': [],
+                            'deleteFromServer': link_message|default is not empty ? false : true
+                        }
+                        %}
+                    </div>
                 </div>
             </div>
 
@@ -199,16 +164,16 @@
                         <div>
                             <label>
                                 {{ form_check('send_user_email', 1, operator.default_reply_options['send_email_to_users'],
-                                    department.getUserEmailTemplate('ticket_opened') == -1 ? {'disabled': 'disabled'} : {}) }}
+                                    department.getUserEmailTemplate('ticket_opened') is null ? {'disabled': 'disabled'} : {}) }}
                                 {{ Lang.get('ticket.send_email_to_users') }}
                             </label>
                         </div>
                     {% endif %}
-                    <div {% if not internal %}class="sp-mt-4"{% endif %}>
+                    <div {% if not internal %}class="sp:mt-4"{% endif %}>
                         <label>
                             {{ form_check('send_operators_email', 1, internal ? 1 : department.notify_operators,
-                                (internal and department.getOperatorEmailTemplate('internal_opened') == -1)
-                            or (not internal and department.getOperatorEmailTemplate('ticket_opened') == -1) ? {'disabled': 'disabled'} : {}) }}
+                                (internal and department.getOperatorEmailTemplate('internal_opened') is null)
+                            or (not internal and department.getOperatorEmailTemplate('ticket_opened') is null) ? {'disabled': 'disabled'} : {}) }}
                             {{ Lang.get('ticket.send_email_to_operators') }}
                         </label>
                     </div>
@@ -248,6 +213,8 @@
 
         $(function () {
             $('textarea[name="text"]').editor($.extend({}, ticket.defaultEditorConfig(), {
+                toolbar_sticky: true,
+                ui_mode: 'split',
                 excludeInternalArticles: {% if internal %}false{% else %}true{% endif %}
             }));
         })
@@ -258,9 +225,9 @@
     <script src="{{ asset_rev('resources/assets/libs/editor.min.js') }}"></script>
 
     <!-- Attachments JS -->
-    <script src="{{ asset_rev('resources/assets/libs/fileupload/js/jquery.fileupload.min.js') }}"></script>
+    <script src="{{ asset_rev('resources/assets/dist/fileupload.min.js') }}"></script>
     <script>
-        new FileUpload();
+        new SpFileUpload.FileUpload();
     </script>
 
     <script src="{{ asset_rev('resources/assets/general/js/done_typing.js') }}"></script>

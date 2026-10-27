@@ -14,31 +14,32 @@
 
     <div class="sp-quick-actions">
         <ul>
-            <li class="sp-action-group sp-inline-block">
+            <li class="sp-action-group">
                 {% if operator|default is not empty and operator and auth_user().hasPermission('create.operator') %}
                     <a href="{{ route('user.operator.operator.create') }}" class="sp-action sp-button">
-                        <i class="fas fa-plus"></i>&nbsp; {{ Lang.get('general.add') }}
-                    </a><!--
+                        <i class="fa-solid fa-plus"></i>
+                        <span class="sp:hidden sp:xs:inline">&nbsp; {{ Lang.get('general.add') }}</span>
+                    </a>
                 {% elseif (operator|default is empty or not operator) and auth_user().hasPermission('create.user') %}
                     <a href="{{ route('user.operator.user.create') }}" class="sp-action sp-button">
-                        <i class="fas fa-plus"></i>&nbsp; {{ Lang.get('general.add') }}
-                    </a><!--
-                {% else %}
-                    <!--
+                        <i class="fa-solid fa-plus"></i>
+                        <span class="sp:hidden sp:xs:inline">&nbsp; {{ Lang.get('general.add') }}</span>
+                    </a>
                 {% endif %}
-                --><button class="sp-action sp-filter-grid">
-                    <i class="fas fa-filter"></i>&nbsp; {{ Lang.get('general.filter') }}
+                <button class="sp-action sp-filter-grid">
+                    <i class="fa-solid fa-filter"></i>
+                    <span class="sp:hidden sp:xs:inline">&nbsp; {{ Lang.get('general.filter') }}</span>
                 </button>
             </li>
 
-            <li class="sp-action-group sp-grid-actions sp-inline-block sp-hidden">
+            <li class="sp-action-group sp-grid-actions sp:hidden">
                 {% if (auth_user().hasPermission('delete.user')) %}
                     <button class="sp-action delete-user" disabled="disabled" title="{{ Lang.get('general.delete') }}">
-                        <i class="fas fa-times"></i>
+                        <i class="fa-solid fa-times"></i>
                     </button>
                 {% endif %}
                 {% if not groups.isEmpty() and auth_user().hasPermission('update.user') %}
-                    <select class="change-group">
+                    <select class="change-group sp:ms-1">
                         <option value="">{{ Lang.get('user.add_group') }}...</option>
                         {% for group in groups %}
                             <option value="{{ group.id }}">{{ group.name }}</option>
@@ -49,7 +50,7 @@
         </ul>
     </div>
 
-    <div class="sp-alert sp-alert-success sp-alert-sticky sp-hidden delete">
+    <div class="sp-alert sp-alert-success sp-alert-sticky sp:hidden delete">
         {% if operator|default is not empty and operator %}
             {{ Lang.get('messages.success_deleted', { 'item': mb_strtolower(Lang.choice('general.operator', 1), 'UTF-8') }) }}
         {% else %}
@@ -57,14 +58,14 @@
         {% endif %}
     </div>
 
-    <div class="sp-alert sp-alert-success sp-alert-sticky sp-hidden update">
+    <div class="sp-alert sp-alert-success sp-alert-sticky sp:hidden update">
         {% if operator|default is not empty and operator %}
             {{ Lang.get('messages.success_updated', { 'item': mb_strtolower(Lang.choice('general.operator', 1), 'UTF-8') }) }}
         {% else %}
             {{ Lang.get('messages.success_updated', { 'item': mb_strtolower(Lang.choice('user.user', 1), 'UTF-8') }) }}
         {% endif %}
     </div>
-    <div class="sp-alert sp-alert-error sp-alert-sticky sp-hidden update">
+    <div class="sp-alert sp-alert-error sp-alert-sticky sp:hidden update">
         {% if operator|default is not empty and operator %}
             {{ Lang.get('messages.error_updated', { 'item': mb_strtolower(Lang.choice('general.operator', 1), 'UTF-8') }) }}
         {% else %}
@@ -80,7 +81,7 @@
         {% include 'operator.' ~ template ~ '.core.search_tabs' %}
     {% endif %}
 
-    <div class="sp-grid-filtering sp-my-6 sp-hidden">
+    <div class="sp-grid-filtering sp:my-6 sp:hidden">
         {% include 'operator.' ~ template ~ '.forms.grid_filtering' %}
     </div>
 
@@ -189,8 +190,8 @@
         function refreshGrid() {
             // Disable the grid actions
             if (! $('tr.selected').length) {
-                $('.sp-grid-actions').addClass('sp-hidden');
-                $('.sp-action-group:not(.sp-grid-actions)').removeClass('sp-hidden');
+                $('.sp-grid-actions').addClass('sp:hidden');
+                $('.sp-action-group:not(.sp-grid-actions)').removeClass('sp:hidden');
             }
             $('.sp-grid-actions :input').prop('disabled', true);
 
